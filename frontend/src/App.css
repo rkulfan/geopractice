@@ -16,3 +16,21 @@
 .right {
   color: rgb(0, 195, 0);
 }
+
+.giveUpButton {
+  background-color: #6b0700;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 10px 0 0 0;
+  cursor: pointer;
+}
+
+.submitButton {
+  background-color: #004802;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 0 0 10px;
+  cursor: pointer;
+}
