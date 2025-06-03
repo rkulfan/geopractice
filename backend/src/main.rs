@@ -14,7 +14,7 @@ async fn get_player(path: web::Path<String>) -> impl Responder {
     println!("{name}");
     // Dummy data
     let player = Player {
-        native: String::from("Арте́мий Пана́рин"),
+        native: String::from("Артемий Панарин"),
         latin: name
     };
     web::Json(player)
