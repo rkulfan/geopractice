@@ -3,22 +3,21 @@ use actix_cors::Cors;
 use actix_web::{get, web, App, HttpServer, Responder};
 
 #[derive(Serialize)]
-struct Location {
-    name: String,
-    lat: f64,
-    lon: f64,
+struct Player {
+    native: String,
+    latin: String
 }
 
-#[get("/location/{name}")]
-async fn get_location(path: web::Path<String>) -> impl Responder {
-    let name = path.into_inner();
+#[get("/player/{name}")]
+async fn get_player(path: web::Path<String>) -> impl Responder {
+    let name = path.into_inner().replace('_', " ");
+    println!("{name}");
     // Dummy data
-    let loc = Location {
-        name: name.clone(),
-        lat: 40.7128,
-        lon: -74.0060,
+    let player = Player {
+        native: String::from("Арте́мий Пана́рин"),
+        latin: name
     };
-    web::Json(loc)
+    web::Json(player)
 }
 
 #[actix_web::main]
@@ -34,7 +33,7 @@ async fn main() -> std::io::Result<()> {
                     .allow_any_header()
                     .max_age(3600),
             )
-            .service(get_location)
+            .service(get_player)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

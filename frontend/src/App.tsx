@@ -1,22 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css'
 
-interface Location {
-  name: string;
-  lat: number;
-  lon: number;
+interface Player {
+  native: string,
+  latin: string
 }
 
 function App() {
-  const [pos, setPos] = useState<Location | null>(null);
+  const [player, setPlayer] = useState<Player | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [inputValue, setInputValue] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
-  function fetchPos() {
+  function fetchPlayer() {
     setLoading(true);
     setError(null);
+    setSubmitted(false); // reset on new player
 
-    fetch('http://localhost:8080/location/NewYork')
+    fetch('http://localhost:8080/player/Artemi_Panarin')
       .then(res => {
         if (!res.ok) {
           throw new Error('Network response was not OK');
@@ -24,7 +27,7 @@ function App() {
         return res.json();
       })
       .then(data => {
-        setPos(data);
+        setPlayer(data);
         setLoading(false);
       })
       .catch(err => {
@@ -33,22 +36,46 @@ function App() {
       });
   }
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!player) return;
+
+    const guess = inputValue.trim().toLowerCase();
+    const answer = player.latin.trim().toLowerCase();
+
+    setIsCorrect(guess === answer);
+    setSubmitted(true);
+  }
+
+  useEffect(() => {
+    fetchPlayer();
+  }, []);
+
   return (
     <>
-      <button onClick={fetchPos}>Get Location</button>
-      <div style={{ marginTop: '1rem' }}>
+      <div style={{ marginTop: '1' }}>
         {loading && <p>Loading...</p>}
         {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-        {pos && (
-          <p>
-            Location: {pos.name} <br />
-            Latitude: {pos.lat} <br />
-            Longitude: {pos.lon}
-          </p>
+        {player && (
+          <div>
+            <p>{player.native}</p>
+            <form onSubmit={handleSubmit}>
+              <input
+                type="text"
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                placeholder="transliteration"
+              />
+            </form>
+            {submitted && (
+              isCorrect ? <p className="right response">yes</p> : <p className="wrong response">no</p>
+            )}
+            <button onClick={fetchPlayer}>Give Up</button>
+          </div>
         )}
       </div>
     </>
   )
 }
 
-export default App
+export default App;
