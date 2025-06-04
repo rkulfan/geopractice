@@ -23,14 +23,14 @@ async fn main() -> std::io::Result<()> {
     let players: Vec<Player> = serde_json::from_str(&data)?;
     let shared_players = web::Data::new(players);
 
-    println!("Starting Rust backend on http://localhost:3000");
+    println!("Starting Rust backend on port 3000");
 
     HttpServer::new(move || {
         App::new()
             .app_data(shared_players.clone())
             .wrap(
                 Cors::default()
-                    .allow_any_origin() // for testing allow all origins
+                    .allowed_origin("http://geopractice.com.s3-website.us-east-2.amazonaws.com")
                     .allow_any_method()
                     .allow_any_header()
                     .max_age(3600),

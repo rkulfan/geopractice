@@ -6,7 +6,7 @@ interface Player {
   latin: string;
 }
 
-const EC2_IP = import.meta.env.API_IP;
+const EC2_IP = import.meta.env.VITE_API_IP;
 
 function App() {
   const [player, setPlayer] = useState<Player | null>(null);
