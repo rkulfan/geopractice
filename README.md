@@ -24,5 +24,5 @@ Website for users to practice and study everything geography related.
     - JavaScript/TypeScript: **React.js** and **Vite**
 
 ## Hosting and Deployment
-- Frontend is hosted on **AWS S3** as a static website.
-- Backend is hosted on an **AWS EC2** instance.
+- Frontend is hosted on **AWS S3** as a static website
+- Backend is hosted on an **AWS EC2** instance
