@@ -6,6 +6,8 @@ interface Player {
   latin: string;
 }
 
+const EC2_IP = import.meta.env.API_IP;
+
 function App() {
   const [player, setPlayer] = useState<Player | null>(null);
   const [error, setError] = useState(null);
@@ -21,7 +23,7 @@ function App() {
     setInputValue('');
     setSubmittedGuess('');
 
-    fetch('http://localhost:3000/player/random')
+    fetch(`http://${EC2_IP}:3000/player/random`)
       .then(res => {
         if (!res.ok) throw new Error('Network response was not OK');
         return res.json();
