@@ -21,7 +21,7 @@ function App() {
     setInputValue('');
     setSubmittedGuess('');
 
-    fetch('http://localhost:8080/player/random')
+    fetch('http://localhost:3000/player/random')
       .then(res => {
         if (!res.ok) throw new Error('Network response was not OK');
         return res.json();

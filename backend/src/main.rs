@@ -23,7 +23,7 @@ async fn main() -> std::io::Result<()> {
     let players: Vec<Player> = serde_json::from_str(&data)?;
     let shared_players = web::Data::new(players);
 
-    println!("Starting Rust backend on http://localhost:8080");
+    println!("Starting Rust backend on http://localhost:3000");
 
     HttpServer::new(move || {
         App::new()
@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(get_random_player)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", 3000))?
     .run()
     .await
 }
