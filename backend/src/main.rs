@@ -1,42 +1,43 @@
-use serde::Serialize;
 use actix_cors::Cors;
-use actix_web::{get, web, App, HttpServer, Responder};
+use actix_web::{App, HttpServer, Responder, get, web};
+use rand::seq::SliceRandom;
+use serde::{Deserialize, Serialize};
+use std::fs;
 
-#[derive(Serialize)]
-struct Location {
-    name: String,
-    lat: f64,
-    lon: f64,
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct Player {
+    native: String,
+    latin: String,
 }
 
-#[get("/location/{name}")]
-async fn get_location(path: web::Path<String>) -> impl Responder {
-    let name = path.into_inner();
-    // Dummy data
-    let loc = Location {
-        name: name.clone(),
-        lat: 40.7128,
-        lon: -74.0060,
-    };
-    web::Json(loc)
+#[get("/player/random")]
+async fn get_random_player(data: web::Data<Vec<Player>>) -> impl Responder {
+    let mut rng = rand::thread_rng();
+    let player = data.choose(&mut rng).unwrap().clone();  // clone to return owned value
+    web::Json(player)
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Starting Rust backend on http://localhost:8080");
+    let data = fs::read_to_string("./data/players.json")?;
+    let players: Vec<Player> = serde_json::from_str(&data)?;
+    let shared_players = web::Data::new(players);
 
-    HttpServer::new(|| {
+    println!("Starting Rust backend on port 3000");
+
+    HttpServer::new(move || {
         App::new()
+            .app_data(shared_players.clone())
             .wrap(
                 Cors::default()
-                    .allow_any_origin()  // for testing allow all origins
+                    .allowed_origin("http://geopractice.com.s3-website.us-east-2.amazonaws.com")
                     .allow_any_method()
                     .allow_any_header()
                     .max_age(3600),
             )
-            .service(get_location)
+            .service(get_random_player)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", 3000))?
     .run()
     .await
 }
