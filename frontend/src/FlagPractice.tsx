@@ -46,15 +46,8 @@ const FlagPractice = () => {
 
         const guess = inputValue.trim();
         const names = normalizeNames(flag.name);
-
-        const normalizedGuess = inputValue.trim().toLowerCase().normalize('NFD').replace('&', "and");
-
-        // console.log("Normalized guess:", normalizedGuess);
-        // console.log("Normalized names:", names.map(n => n.trim().toLowerCase().normalize('NFD')));
-
-        const isCorrect = names.some(n =>
-            n.trim().toLowerCase().normalize('NFD') === normalizedGuess
-        );
+        const normalizedGuess = normalizeText(guess);
+        const isCorrect = names.some(n => normalizeText(n) === normalizedGuess);
 
         setSubmittedGuess(guess);
         setIsCorrect(isCorrect);
@@ -70,6 +63,15 @@ const FlagPractice = () => {
     function normalizeNames(name: string | string[] | undefined): string[] {
         if (!name) return [];
         return Array.isArray(name) ? name : [name];
+    }
+
+    function normalizeText(str: string): string {
+        return str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace('&', 'and')
+            .toLowerCase()
+            .trim();
     }
 
     useEffect(() => {
