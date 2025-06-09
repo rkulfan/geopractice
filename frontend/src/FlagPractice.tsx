@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
+import { CountryDropdown } from './components/FlagHelpers';
 
 const EC2_IP = import.meta.env.VITE_API_IP;
 
 interface Country {
-    name: string;
     code: string;
+    name: string[];
 }
 
 const FlagPractice = () => {
+    const [category, setCategory] = useState('');
     const [flag, setFlag] = useState<Country | null>(null);
     const [error, setError] = useState(null);
     const [inputValue, setInputValue] = useState('');
@@ -22,12 +24,13 @@ const FlagPractice = () => {
         setInputValue('');
         setSubmittedGuess('');
 
-        fetch(`http://${EC2_IP}:3000/flag/random`)
+        fetch(`http://${EC2_IP}:3000/flag/random?category=${category}`)
             .then(res => {
                 if (!res.ok) throw new Error('Network response was not OK');
                 return res.json();
             })
             .then(data => {
+                // console.log('Flag data:', data);
                 setFlag(data);
             })
             .catch(err => {
@@ -42,28 +45,41 @@ const FlagPractice = () => {
         setPreviousAnswer(null);
 
         const guess = inputValue.trim();
-        const guessLower = guess.toLowerCase();
-        const answer = flag.name.trim().toLowerCase().normalize('NFD');
+        const names = normalizeNames(flag.name);
+
+        const normalizedGuess = inputValue.trim().toLowerCase().normalize('NFD').replace('&', "and");
+
+        // console.log("Normalized guess:", normalizedGuess);
+        // console.log("Normalized names:", names.map(n => n.trim().toLowerCase().normalize('NFD')));
+
+        const isCorrect = names.some(n =>
+            n.trim().toLowerCase().normalize('NFD') === normalizedGuess
+        );
 
         setSubmittedGuess(guess);
-        setIsCorrect(guessLower === answer);
+        setIsCorrect(isCorrect);
         setSubmitted(true);
         setGaveUp(false);
 
-        if (guessLower === answer) {
-            setPreviousAnswer(flag.name);
+        if (isCorrect) {
+            setPreviousAnswer(names[0]);
             fetchRandomFlag();
         }
     }
 
+    function normalizeNames(name: string | string[] | undefined): string[] {
+        if (!name) return [];
+        return Array.isArray(name) ? name : [name];
+    }
+
     useEffect(() => {
         fetchRandomFlag();
-    }, []);
+    }, [category]);
 
     function handleGiveUp() {
         if (!flag) return;
 
-        setPreviousAnswer(flag.name);
+        setPreviousAnswer(flag.name[0]);
         setSubmittedGuess('');
         setIsCorrect(false);
         setGaveUp(true);
@@ -75,10 +91,15 @@ const FlagPractice = () => {
     return (
         <>
             <div>
+                <CountryDropdown
+                    selected={category}
+                    onChange={(value) => {
+                        setCategory(value);
+                    }}
+                />
                 <h2>Which country's flag is this?</h2>
                 {error && <p style={{ color: 'red' }}>Error: {error}</p>}
                 {flag ? (
-
                     <div>
                         <img
                             src={`https://flagcdn.com/h240/${flag.code}.png`}
@@ -103,7 +124,6 @@ const FlagPractice = () => {
                         )}
                         <button className="giveUpButton" onClick={handleGiveUp}>Give Up</button>
                     </div>
-
                 ) : (
                     <p>Loading...</p>
                 )}
