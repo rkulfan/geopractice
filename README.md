@@ -3,9 +3,10 @@ Website for users to practice and study everything geography related.
 
 ## Existing Features
 - Russian cyrillic transliteration of Russian ice hockey player names
+- Country flag identification practice
 
 ## Planned Features
-- Country flag identification quizzes
+- Country flag identification multiple choice + streaks
 - Country capital quizzes
 - Further language identification and transliteration practice
 - Other areas to practice:
@@ -26,3 +27,21 @@ Website for users to practice and study everything geography related.
 ## Hosting and Deployment
 - Frontend is hosted on **AWS S3** as a static website
 - Backend is hosted on an **AWS EC2** instance
+
+## Running Locally
+## Project SetupAdd commentMore actions
+
+
+### Backend Setup (Rust)
+1. From your main project directory, make sure Rust is installed. If not, install it from [rustup.rs](https://rustup.rs/)
+2. Navigate to the backend directory with `cd ./backend`
+3. Build and run the backend server with `cargo run`
+
+### Frontend Setup
+1. Return to the main project directory
+2. Navigate to the frontend directory with `cd ./frontend`
+3. Create a file inside of the frontend directory called .env
+4. Within the .env file define a variable `VITE_API_IP=localhost` and save
+5. Run `npm install` to install dependencies
+6. Run the frontend using `npm run dev`
+7. Open your browser to the URL shown in the terminal (usually http://localhost:5173)
