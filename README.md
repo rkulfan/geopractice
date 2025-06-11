@@ -29,8 +29,6 @@ Website for users to practice and study everything geography related.
 - Backend is hosted on an **AWS EC2** instance
 
 ## Running Locally
-## Project SetupAdd commentMore actions
-
 
 ### Backend Setup (Rust)
 1. From your main project directory, make sure Rust is installed. If not, install it from [rustup.rs](https://rustup.rs/)
