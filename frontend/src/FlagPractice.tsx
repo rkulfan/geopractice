@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CountryDropdown } from './components/FlagHelpers';
+import type { CategoryOption } from './components/FlagHelpers';
 
 const EC2_IP = import.meta.env.VITE_API_IP;
 
@@ -9,7 +10,7 @@ interface Country {
 }
 
 const FlagPractice = () => {
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState<CategoryOption>({ value: 'countries', name: "Countries", tag: "country's" });
     const [flag, setFlag] = useState<Country | null>(null);
     const [error, setError] = useState(null);
     const [inputValue, setInputValue] = useState('');
@@ -24,7 +25,7 @@ const FlagPractice = () => {
         setInputValue('');
         setSubmittedGuess('');
 
-        fetch(`http://${EC2_IP}:3000/flag/random?category=${category}`)
+        fetch(`http://${EC2_IP}:3000/flag/random?category=${category.value}`)
             .then(res => {
                 if (!res.ok) throw new Error('Network response was not OK');
                 return res.json();
@@ -95,11 +96,9 @@ const FlagPractice = () => {
             <div>
                 <CountryDropdown
                     selected={category}
-                    onChange={(value) => {
-                        setCategory(value);
-                    }}
+                    onChange={(value: CategoryOption) => setCategory(value)}
                 />
-                <h2>Which country's flag is this?</h2>
+                <h2>Which {category.tag} flag is this?</h2>
                 {error && <p style={{ color: 'red' }}>Error: {error}</p>}
                 {flag ? (
                     <div>
