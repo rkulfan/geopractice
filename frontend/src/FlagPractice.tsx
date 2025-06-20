@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { CountryDropdown } from './components/FlagHelpers';
-import type { CategoryOption } from './components/FlagHelpers';
+import { CategoryDropdown, ModeDropdown } from './components/FlagHelpers';
+import type { CategoryOption, ModeOption } from './components/FlagHelpers';
 
 const EC2_IP = import.meta.env.VITE_API_IP;
 
@@ -11,6 +11,7 @@ interface Country {
 
 const FlagPractice = () => {
     const [category, setCategory] = useState<CategoryOption>({ value: 'countries', name: "Countries", tag: "country's" });
+    const [mode, setMode] = useState<ModeOption>({ value: 'typed', name: "Typed" });
     const [flag, setFlag] = useState<Country | null>(null);
     const [error, setError] = useState(null);
     const [inputValue, setInputValue] = useState('');
@@ -94,9 +95,13 @@ const FlagPractice = () => {
     return (
         <>
             <div>
-                <CountryDropdown
+                <CategoryDropdown
                     selected={category}
                     onChange={(value: CategoryOption) => setCategory(value)}
+                />
+                <ModeDropdown
+                    selected={mode}
+                    onChange={(value: ModeOption) => setMode(value)}
                 />
                 <h2>Which {category.tag} flag is this?</h2>
                 {error && <p style={{ color: 'red' }}>Error: {error}</p>}

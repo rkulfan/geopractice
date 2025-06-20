@@ -4,12 +4,22 @@ export interface CategoryOption {
   tag: string;
 }
 
+export interface ModeOption {
+  value: string;
+  name: string;
+}
+
 interface CategoryDropdownProps {
   selected: CategoryOption;
   onChange: (value: CategoryOption) => void;
 }
 
-const options: CategoryOption[] = [
+interface ModeDropdownProps {
+  selected: ModeOption;
+  onChange: (value: ModeOption) => void;
+}
+
+const categoryOptions: CategoryOption[] = [
   { value: 'countries', name: 'Countries', tag: "country's" },
   { value: 'territories', name: 'Territories', tag: "territory's" },
   { value: 'us-states', name: 'US States', tag: "US state's" },
@@ -17,18 +27,23 @@ const options: CategoryOption[] = [
   { value: 'all', name: 'All', tag: '' }
 ];
 
-export function CountryDropdown({ selected, onChange }: CategoryDropdownProps) {
+const modeOptions: ModeOption[] = [
+  { value: 'typed', name: "Typed" },
+  { value: 'multiplechoice', name: "Multiple Choice" }
+];
+
+export function CategoryDropdown({ selected, onChange }: CategoryDropdownProps) {
   return (
     <select
       value={selected.value}
       onChange={(e) => {
-        const selectedOption = options.find(opt => opt.value === e.target.value);
+        const selectedOption = categoryOptions.find(opt => opt.value === e.target.value);
         if (selectedOption) {
           onChange(selectedOption);
         }
       }}
     >
-      {options.map(({ value, name }) => (
+      {categoryOptions.map(({ value, name }) => (
         <option key={value} value={value}>
           {name}
         </option>
@@ -37,3 +52,22 @@ export function CountryDropdown({ selected, onChange }: CategoryDropdownProps) {
   );
 }
 
+export function ModeDropdown({ selected, onChange }: ModeDropdownProps) {
+  return (
+    <select
+      value={selected.value}
+      onChange={(e) => {
+        const selectedOption = modeOptions.find(opt => opt.value === e.target.value);
+        if (selectedOption) {
+          onChange(selectedOption);
+        }
+      }}
+    >
+      {modeOptions.map(({ value, name }) => (
+        <option key={value} value={value}>
+          {name}
+        </option>
+      ))}
+    </select>
+  );
+}
