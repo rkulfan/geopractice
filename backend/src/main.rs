@@ -48,6 +48,28 @@ async fn get_random_player(data: web::Data<Vec<Player>>) -> impl Responder {
     web::Json(player)
 }
 
+#[get("/country/random")]
+async fn get_random_country(
+    data: web::Data<FlagMap>
+) -> impl Responder {
+    use rand::seq::SliceRandom;
+
+    let mut rng = rand::thread_rng();
+
+    let all_entries = data
+        .values()
+        .flat_map(|map| map.iter())
+        .collect::<Vec<_>>();
+
+    if let Some((_code, name_list)) = all_entries.choose(&mut rng) {
+        if let Some(name) = name_list.choose(&mut rng) {
+            return web::Json(name.clone());
+        }
+    }
+
+    web::Json("Unknown".to_string())
+}
+
 #[get("/flag/random")]
 async fn get_random_flag(
     data: web::Data<FlagMap>,
@@ -121,6 +143,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(get_random_player)
             .service(get_random_flag)
+            .service(get_random_country)
     })
     .bind(("0.0.0.0", 3000))?
     .run()
