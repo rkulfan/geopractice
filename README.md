@@ -45,6 +45,3 @@ Website for users to practice and study everything geography related.
 5. Run `npm install` to install dependencies
 6. Run the frontend using `npm run dev`
 7. Open your browser to the URL shown in the terminal (usually http://localhost:5173)
-
-
-Powered by <a href="https://www.getsongbpm.com">GetSongBPM</a>
