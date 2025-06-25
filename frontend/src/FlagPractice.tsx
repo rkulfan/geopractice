@@ -21,6 +21,8 @@ const FlagPractice = () => {
     const [isCorrect, setIsCorrect] = useState(false);
     const [submittedGuess, setSubmittedGuess] = useState('');
     const [previousAnswer, setPreviousAnswer] = useState<string | null>(null);
+    const [multipleChoiceGuesses, setMultipleChoiceGuesses] = useState(2);
+    const [streak, setStreak] = useState(0);
 
     function fetchRandomFlag() {
         setError(null);
@@ -80,9 +82,13 @@ const FlagPractice = () => {
         setGaveUp(false);
 
         if (isCorrect) {
+            setStreak(prev => prev + 1);
             setPreviousAnswer(names[0]);
             fetchRandomFlag();
+        } else {
+            setStreak(0);
         }
+        setInputValue("");
     }
 
     function handleChoiceSubmit(choice: string) {
@@ -99,9 +105,20 @@ const FlagPractice = () => {
         setGaveUp(false);
 
         if (isCorrect) {
+            setStreak(prev => prev + 1);
             setPreviousAnswer(names[0]);
+            setMultipleChoiceGuesses(2);
             fetchRandomFlag();
+        } else if (multipleChoiceGuesses > 1) {
+            setOptions(options.filter(option => option !== choice));
+            setMultipleChoiceGuesses(prev => prev - 1);
+            setStreak(0);
+        } else {
+            setStreak(0);
+            setMultipleChoiceGuesses(2);
+            handleGiveUp();
         }
+        console.log(multipleChoiceGuesses);
     }
 
     function normalizeNames(name: string | string[] | undefined): string[] {
@@ -193,6 +210,7 @@ const FlagPractice = () => {
                             )
                         )}
                         <button className="giveUpButton" onClick={handleGiveUp}>Give Up</button>
+                        <p>Streak: {streak}</p>
                     </div>
                 ) : (
                     <p>Loading...</p>
