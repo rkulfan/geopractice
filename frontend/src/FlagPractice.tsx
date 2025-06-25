@@ -51,9 +51,21 @@ const FlagPractice = () => {
         // select 3 wrong options while rejecting dupes
         const wrongs: Set<string> = new Set();
         while (wrongs.size < 3) {
-            const res = await fetch(`http://${EC2_IP}:3000/country/random`);
-            const name: string = await res.json();
-            if (normalizeText(name) !== normalizeText(correct)) wrongs.add(name);
+            while (wrongs.size < 3) {
+                try {
+                    const res = await fetch(`http://${EC2_IP}:3000/flag/random?category=${category.value}`);
+                    if (!res.ok) throw new Error('Network response was not OK');
+
+                    const data = await res.json();
+                    const name = normalizeNames(data.name)[0];
+
+                    if (normalizeText(name) !== normalizeText(correct)) {
+                        wrongs.add(name);
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
         }
 
         const all = [...wrongs, correct];
