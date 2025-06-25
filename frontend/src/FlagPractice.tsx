@@ -21,6 +21,7 @@ const FlagPractice = () => {
     const [isCorrect, setIsCorrect] = useState(false);
     const [submittedGuess, setSubmittedGuess] = useState('');
     const [previousAnswer, setPreviousAnswer] = useState<string | null>(null);
+    const [multipleChoiceGuesses, setMultipleChoiceGuesses] = useState(2);
 
     function fetchRandomFlag() {
         setError(null);
@@ -100,8 +101,16 @@ const FlagPractice = () => {
 
         if (isCorrect) {
             setPreviousAnswer(names[0]);
+            setMultipleChoiceGuesses(2);
             fetchRandomFlag();
+        } else if (multipleChoiceGuesses > 1) {
+            setOptions(options.filter(option => option !== choice));
+            setMultipleChoiceGuesses(prev => prev - 1);
+        } else {
+            setMultipleChoiceGuesses(2);
+            handleGiveUp();
         }
+        console.log(multipleChoiceGuesses);
     }
 
     function normalizeNames(name: string | string[] | undefined): string[] {
