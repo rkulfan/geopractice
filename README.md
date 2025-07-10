@@ -42,7 +42,7 @@ Website for users to practice and study everything geography related.
 1. Return to the main project directory
 2. Navigate to the frontend directory with `cd ./frontend`
 3. Create a file inside of the frontend directory called .env
-4. Within the .env file define a variable `VITE_API_IP=localhost` and save
+4. Within the .env file define a variable `VITE_API_BASE_URL=http://localhost:8000` and save
 5. Run `npm install` to install dependencies
 6. Run the frontend using `npm run dev`
 7. Open your browser to the URL shown in the terminal (usually http://localhost:5173)
