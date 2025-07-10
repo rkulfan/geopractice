@@ -6,7 +6,7 @@ interface Player {
   latin: string;
 }
 
-const EC2_IP = import.meta.env.VITE_API_IP;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function RussianPractice() {
   const [player, setPlayer] = useState<Player | null>(null);
@@ -23,7 +23,7 @@ function RussianPractice() {
     setInputValue('');
     setSubmittedGuess('');
 
-    fetch(`http://${EC2_IP}:8000/player/random`)
+    fetch(`${API_BASE_URL}/player/random`)
       .then(res => {
         if (!res.ok) throw new Error('Network response was not OK');
         return res.json();
