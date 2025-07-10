@@ -35,7 +35,7 @@ Website for users to practice and study everything geography related.
 1. Ensure you have both Python 3.11+ and Docker installed
 2. Navigate to the backend directory with `cd ./backend`
 3. Build the Docker image with `docker build -t django-backend .`
-4. Run the Docker container with `docker run -p 8000:8000 my-django-backend`
+4. Run the Docker container with `docker run -p 8000:8000 django-backend`
 5. The backend will be available at http://localhost:8000
 
 ### Frontend Setup
