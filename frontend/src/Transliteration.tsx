@@ -23,7 +23,7 @@ function RussianPractice() {
     setInputValue('');
     setSubmittedGuess('');
 
-    fetch(`http://${EC2_IP}:3000/player/random`)
+    fetch(`http://${EC2_IP}:8000/player/random`)
       .then(res => {
         if (!res.ok) throw new Error('Network response was not OK');
         return res.json();

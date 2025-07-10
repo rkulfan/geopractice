@@ -21,7 +21,7 @@ Website for users to practice and study everything geography related.
 -   **Communication Protocol**:
     - **REST**
 -   **Backend**:
-    - Rust: **Actix-web**
+    - Python: **Django**
 -   **Frontend**:
     - JavaScript/TypeScript: **React.js** and **Vite**
 
