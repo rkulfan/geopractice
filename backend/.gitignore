@@ -1,1 +1,41 @@
-/target
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+VENV/
+*.env
+
+# VS Code settings (optional)
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Django
+db.sqlite3
+*.log
+
+# Pytest / coverage
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.cache/
+
+# Pip
+pip-log.txt
+
+# Migrations (optional: keep if you want to version them)
+# **/migrations/*.py
+**/migrations/*.pyc
