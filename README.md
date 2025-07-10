@@ -31,10 +31,12 @@ Website for users to practice and study everything geography related.
 
 ## Running Locally
 
-### Backend Setup (Rust)
-1. From your main project directory, make sure Rust is installed. If not, install it from [rustup.rs](https://rustup.rs/)
+### Backend Setup
+1. Ensure you have both Python 3.11+ and Docker installed
 2. Navigate to the backend directory with `cd ./backend`
-3. Build and run the backend server with `cargo run`
+3. Build the Docker image with `docker build -t django-backend .`
+4. Run the Docker container with `docker run -p 8000:8000 my-django-backend`
+5. The backend will be available at http://localhost:8000
 
 ### Frontend Setup
 1. Return to the main project directory
