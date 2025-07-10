@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { CategoryDropdown, ModeDropdown } from './components/FlagHelpers';
 import type { CategoryOption, ModeOption } from './components/FlagHelpers';
 
-const EC2_IP = import.meta.env.VITE_API_IP;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface Country {
     code: string;
@@ -29,7 +29,7 @@ const FlagPractice = () => {
         setInputValue('');
         setSubmittedGuess('');
 
-        fetch(`http://${EC2_IP}:8000/flag/random?category=${category.value}`)
+        fetch(`${API_BASE_URL}/flag/random?category=${category.value}`)
             .then(res => {
                 if (!res.ok) throw new Error('Network response was not OK');
                 return res.json();
@@ -53,7 +53,7 @@ const FlagPractice = () => {
         while (wrongs.size < 3) {
             while (wrongs.size < 3) {
                 try {
-                    const res = await fetch(`http://${EC2_IP}:8000/flag/random?category=${category.value}`);
+                    const res = await fetch(`${API_BASE_URL}/flag/random?category=${category.value}`);
                     if (!res.ok) throw new Error('Network response was not OK');
 
                     const data = await res.json();
