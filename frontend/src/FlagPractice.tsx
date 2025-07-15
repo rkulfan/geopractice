@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { CategoryDropdown, ModeDropdown } from './components/FlagHelpers';
-import type { CategoryOption, ModeOption } from './components/FlagHelpers';
+import { CategoryDropdown, ModeDropdown, PracticeDropdown } from './components/FlagHelpers';
+import type { CategoryOption, ModeOption, PracticeOption } from './components/FlagHelpers';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,8 +11,9 @@ interface Country {
 
 const FlagPractice = () => {
     const [category, setCategory] = useState<CategoryOption>({ value: 'countries', name: "Countries", tag: "country's" });
-    const [options, setOptions] = useState<string[]>([]);
     const [mode, setMode] = useState<ModeOption>({ value: 'typed', name: "Typed" });
+    const [practice, setPractice] = useState<PracticeOption>({ value: 'practice', name: "Practice" });
+    const [options, setOptions] = useState<string[]>([]);
     const [flag, setFlag] = useState<Country | null>(null);
     const [error, setError] = useState(null);
     const [inputValue, setInputValue] = useState('');
@@ -180,6 +181,10 @@ const FlagPractice = () => {
                 <ModeDropdown
                     selected={mode}
                     onChange={(value: ModeOption) => setMode(value)}
+                />
+                <PracticeDropdown
+                    selected={practice}
+                    onChange={(value: PracticeOption) => setPractice(value)}
                 />
                 <h2>Which {category.tag} flag is this?</h2>
                 {error && <p style={{ color: 'red' }}>Error: {error}</p>}

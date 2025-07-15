@@ -9,6 +9,11 @@ export interface ModeOption {
   name: string;
 }
 
+export interface PracticeOption {
+  value: string;
+  name: string;
+}
+
 interface CategoryDropdownProps {
   selected: CategoryOption;
   onChange: (value: CategoryOption) => void;
@@ -17,6 +22,11 @@ interface CategoryDropdownProps {
 interface ModeDropdownProps {
   selected: ModeOption;
   onChange: (value: ModeOption) => void;
+}
+
+interface PracticeDropdownProps {
+  selected: PracticeOption;
+  onChange: (value: PracticeOption) => void;
 }
 
 const categoryOptions: CategoryOption[] = [
@@ -30,6 +40,11 @@ const categoryOptions: CategoryOption[] = [
 const modeOptions: ModeOption[] = [
   { value: 'typed', name: "Typed" },
   { value: 'multiplechoice', name: "Multiple Choice" }
+];
+
+const practiceOptions: ModeOption[] = [
+  { value: 'practice', name: "Practice" },
+  { value: 'normal', name: "Normal" }
 ];
 
 export function CategoryDropdown({ selected, onChange }: CategoryDropdownProps) {
@@ -64,6 +79,26 @@ export function ModeDropdown({ selected, onChange }: ModeDropdownProps) {
       }}
     >
       {modeOptions.map(({ value, name }) => (
+        <option key={value} value={value}>
+          {name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+export function PracticeDropdown({ selected, onChange }: PracticeDropdownProps) {
+  return (
+    <select
+      value={selected.value}
+      onChange={(e) => {
+        const selectedOption = practiceOptions.find(opt => opt.value === e.target.value);
+        if (selectedOption) {
+          onChange(selectedOption);
+        }
+      }}
+    >
+      {practiceOptions.map(({ value, name }) => (
         <option key={value} value={value}>
           {name}
         </option>
