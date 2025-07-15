@@ -10,7 +10,7 @@ export interface ModeOption {
 }
 
 export interface PracticeOption {
-  value: string;
+  value: number;
   name: string;
 }
 
@@ -42,9 +42,9 @@ const modeOptions: ModeOption[] = [
   { value: 'multiplechoice', name: "Multiple Choice" }
 ];
 
-const practiceOptions: ModeOption[] = [
-  { value: 'practice', name: "Practice" },
-  { value: 'normal', name: "Normal" }
+const practiceOptions: PracticeOption[] = [
+  { value: 1, name: "Practice" },
+  { value: 0, name: "Normal" }
 ];
 
 export function CategoryDropdown({ selected, onChange }: CategoryDropdownProps) {
@@ -92,7 +92,7 @@ export function PracticeDropdown({ selected, onChange }: PracticeDropdownProps) 
     <select
       value={selected.value}
       onChange={(e) => {
-        const selectedOption = practiceOptions.find(opt => opt.value === e.target.value);
+        const selectedOption = practiceOptions.find(opt => opt.value === Number(e.target.value));
         if (selectedOption) {
           onChange(selectedOption);
         }

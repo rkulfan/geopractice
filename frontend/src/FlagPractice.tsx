@@ -12,7 +12,7 @@ interface Country {
 const FlagPractice = () => {
     const [category, setCategory] = useState<CategoryOption>({ value: 'countries', name: "Countries", tag: "country's" });
     const [mode, setMode] = useState<ModeOption>({ value: 'typed', name: "Typed" });
-    const [practice, setPractice] = useState<PracticeOption>({ value: 'practice', name: "Practice" });
+    const [practice, setPractice] = useState<PracticeOption>({ value: 0, name: "Practice" });
     const [options, setOptions] = useState<string[]>([]);
     const [flag, setFlag] = useState<Country | null>(null);
     const [error, setError] = useState(null);
@@ -24,6 +24,11 @@ const FlagPractice = () => {
     const [previousAnswer, setPreviousAnswer] = useState<string | null>(null);
     const [multipleChoiceGuesses, setMultipleChoiceGuesses] = useState(2);
     const [streak, setStreak] = useState(0);
+    const [correct, setCorrect] = useState(0);
+    const [incorrect, setIncorrect] = useState(0);
+    const [elapsed, setElapsed] = useState(0);
+    const [allFlags, setAllFlags] = useState<Country[]>([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     function fetchRandomFlag() {
         setError(null);
@@ -48,35 +53,32 @@ const FlagPractice = () => {
             });
     }
 
-    async function buildOptions(correct: string) {
-        // select 3 wrong options while rejecting dupes
-        const wrongs: Set<string> = new Set();
-        while (wrongs.size < 3) {
-            while (wrongs.size < 3) {
-                try {
-                    const res = await fetch(`${API_BASE_URL}/flag/random?category=${category.value}`);
-                    if (!res.ok) throw new Error('Network response was not OK');
+    function buildOptions(correct: string) {
+        if (!allFlags.length) return;
 
-                    const data = await res.json();
-                    const name = normalizeNames(data.name)[0];
+        const wrongOptions = allFlags
+            .filter(f => normalizeText(f.name[0]) !== normalizeText(correct))
+            .map(f => f.name[0]);
 
-                    if (normalizeText(name) !== normalizeText(correct)) {
-                        wrongs.add(name);
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-            }
+        const selectedWrongs: string[] = [];
+        while (selectedWrongs.length < 3 && wrongOptions.length > 0) {
+            // pick a random wrong option and remove it from the pool
+            const idx = Math.floor(Math.random() * wrongOptions.length);
+            selectedWrongs.push(wrongOptions[idx]);
+            wrongOptions.splice(idx, 1);
         }
 
-        const all = [...wrongs, correct];
-        // shuffle in‑place
+        const all = [...selectedWrongs, correct];
+
+        // shuffle in place
         for (let i = all.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [all[i], all[j]] = [all[j], all[i]];
         }
+
         setOptions(all);
     }
+
 
     function handleTypedSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -97,9 +99,19 @@ const FlagPractice = () => {
         if (isCorrect) {
             setStreak(prev => prev + 1);
             setPreviousAnswer(names[0]);
-            fetchRandomFlag();
+            if (practice.value == 0) {
+                setCorrect(correct + 1);
+                nextFlag();
+            } else {
+                fetchRandomFlag();
+            }
         } else {
             setStreak(0);
+            if (practice.value == 0) {
+                setPreviousAnswer(names[0]);
+                setIncorrect(incorrect + 1);
+                nextFlag();
+            }
         }
         setInputValue("");
     }
@@ -121,15 +133,26 @@ const FlagPractice = () => {
             setStreak(prev => prev + 1);
             setPreviousAnswer(names[0]);
             setMultipleChoiceGuesses(2);
-            fetchRandomFlag();
-        } else if (multipleChoiceGuesses > 1) {
+            if (practice.value == 0) {
+                setCorrect(correct + 1);
+                nextFlag();
+            } else {
+                fetchRandomFlag();
+            }
+        } else if (practice.value == 1 && multipleChoiceGuesses > 1) {
             setOptions(options.filter(option => option !== choice));
             setMultipleChoiceGuesses(prev => prev - 1);
             setStreak(0);
         } else {
             setStreak(0);
             setMultipleChoiceGuesses(2);
-            handleGiveUp();
+            if (practice.value == 0) {
+                setPreviousAnswer(names[0]);
+                setIncorrect(incorrect + 1);
+                nextFlag();
+            } else {
+                handleGiveUp();
+            }
         }
         console.log(multipleChoiceGuesses);
     }
@@ -148,8 +171,48 @@ const FlagPractice = () => {
             .trim();
     }
 
+    function playNormalMode() {
+        setIncorrect(0);
+        setCorrect(0);
+
+        fetch(`${API_BASE_URL}/flag/all?category=${category.value}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not OK');
+                return res.json();
+            })
+            .then(data => {
+                for (let i = data.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [data[i], data[j]] = [data[j], data[i]];
+                }
+                setAllFlags(data);
+                setCurrentIndex(0);
+                setFlag(data[0]);
+                if (mode.value !== 'typed') {
+                    const correct = normalizeNames(data[0].name)[0];
+                    buildOptions(correct);
+                }
+            })
+            .catch(err => {
+                setError(err.message);
+            });
+    }
+
+
+    function nextFlag() {
+        const nextIndex = currentIndex + 1;
+        if (nextIndex < allFlags.length) {
+            setCurrentIndex(nextIndex);
+            setFlag(allFlags[nextIndex]);
+        }
+    }
+
     useEffect(() => {
-        fetchRandomFlag();
+        if (practice.value) {
+            fetchRandomFlag();
+        } else {
+            playNormalMode();
+        }
     }, [category]);
 
     useEffect(() => {
@@ -158,6 +221,13 @@ const FlagPractice = () => {
             buildOptions(correct);
         }
     }, [mode, flag]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setElapsed((prev) => prev + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [practice]);
 
     function handleGiveUp() {
         if (!flag) return;
@@ -184,7 +254,14 @@ const FlagPractice = () => {
                 />
                 <PracticeDropdown
                     selected={practice}
-                    onChange={(value: PracticeOption) => setPractice(value)}
+                    onChange={
+                        (value: PracticeOption) => {
+                            setPractice(value);
+                            if (practice.value == 0) {
+                                playNormalMode();
+                            }
+                        }
+                    }
                 />
                 <h2>Which {category.tag} flag is this?</h2>
                 {error && <p style={{ color: 'red' }}>Error: {error}</p>}
@@ -228,6 +305,12 @@ const FlagPractice = () => {
                         )}
                         <button className="giveUpButton" onClick={handleGiveUp}>Give Up</button>
                         <p>Streak: {streak}</p>
+                        {practice.value == 0 && <div>
+                            <p>Correct: {correct}</p>
+                            <p>Incorrect: {incorrect}</p>
+                            <p>Time: {elapsed}</p>
+                        </div>}
+
                     </div>
                 ) : (
                     <p>Loading...</p>
