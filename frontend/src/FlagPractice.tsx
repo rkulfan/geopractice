@@ -27,8 +27,11 @@ const FlagPractice = () => {
     const [correct, setCorrect] = useState(0);
     const [incorrect, setIncorrect] = useState(0);
     const [elapsed, setElapsed] = useState(0);
+    const [longestStreak, setLongestStreak] = useState(0);
     const [allFlags, setAllFlags] = useState<Country[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [started, setStarted] = useState(false);
+    const [finished, setFinished] = useState(false);
 
     function fetchRandomFlag() {
         setError(null);
@@ -79,12 +82,11 @@ const FlagPractice = () => {
         setOptions(all);
     }
 
-
     function handleTypedSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!flag) return;
 
-        setPreviousAnswer(null);
+        if (!started) setStarted(true);
 
         const guess = inputValue.trim();
         const names = normalizeNames(flag.name);
@@ -97,10 +99,14 @@ const FlagPractice = () => {
         setGaveUp(false);
 
         if (isCorrect) {
-            setStreak(prev => prev + 1);
+            setStreak(prev => {
+                const newStreak = prev + 1;
+                setLongestStreak(ls => Math.max(ls, newStreak));
+                return newStreak;
+            });
             setPreviousAnswer(names[0]);
             if (practice.value == 0) {
-                setCorrect(correct + 1);
+                setCorrect(prev => prev + 1);
                 nextFlag();
             } else {
                 fetchRandomFlag();
@@ -109,7 +115,8 @@ const FlagPractice = () => {
             setStreak(0);
             if (practice.value == 0) {
                 setPreviousAnswer(names[0]);
-                setIncorrect(incorrect + 1);
+                setIncorrect(prev => prev + 1);
+                setGaveUp(true);
                 nextFlag();
             }
         }
@@ -118,6 +125,7 @@ const FlagPractice = () => {
 
     function handleChoiceSubmit(choice: string) {
         if (!flag) return;
+        if (!started) setStarted(true);
 
         console.log(choice)
 
@@ -130,11 +138,15 @@ const FlagPractice = () => {
         setGaveUp(false);
 
         if (isCorrect) {
-            setStreak(prev => prev + 1);
+            setStreak(prev => {
+                const newStreak = prev + 1;
+                setLongestStreak(ls => Math.max(ls, newStreak));
+                return newStreak;
+            });
             setPreviousAnswer(names[0]);
             setMultipleChoiceGuesses(2);
             if (practice.value == 0) {
-                setCorrect(correct + 1);
+                setCorrect(prev => prev + 1);
                 nextFlag();
             } else {
                 fetchRandomFlag();
@@ -148,7 +160,8 @@ const FlagPractice = () => {
             setMultipleChoiceGuesses(2);
             if (practice.value == 0) {
                 setPreviousAnswer(names[0]);
-                setIncorrect(incorrect + 1);
+                setIncorrect(prev => prev + 1);
+                setGaveUp(true);
                 nextFlag();
             } else {
                 handleGiveUp();
@@ -157,23 +170,39 @@ const FlagPractice = () => {
         console.log(multipleChoiceGuesses);
     }
 
-    function normalizeNames(name: string | string[] | undefined): string[] {
-        if (!name) return [];
-        return Array.isArray(name) ? name : [name];
-    }
+    function handleGiveUp() {
+        if (!flag) return;
 
-    function normalizeText(str: string): string {
-        return str
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace('&', 'and')
-            .toLowerCase()
-            .trim();
+        if (streak > longestStreak) {
+            setLongestStreak(streak);
+        }
+        setStreak(0);
+        setPreviousAnswer(flag.name[0]);
+        setSubmittedGuess('');
+        setIsCorrect(false);
+        setGaveUp(true);
+        setSubmitted(false);
+        if (practice.value == 1) {
+            fetchRandomFlag();
+        } else {
+            setIncorrect(prev => prev + 1);
+            nextFlag();
+        }
     }
 
     function playNormalMode() {
+        setElapsed(0);
         setIncorrect(0);
         setCorrect(0);
+        setStreak(0);
+        setLongestStreak(0);
+        setStarted(false);
+        setFinished(false);
+        setSubmitted(false);
+        setError(null);
+        setInputValue('');
+        setSubmittedGuess('');
+        setPreviousAnswer('');
 
         fetch(`${API_BASE_URL}/flag/all?category=${category.value}`)
             .then(res => {
@@ -198,13 +227,38 @@ const FlagPractice = () => {
             });
     }
 
-
     function nextFlag() {
         const nextIndex = currentIndex + 1;
         if (nextIndex < allFlags.length) {
             setCurrentIndex(nextIndex);
             setFlag(allFlags[nextIndex]);
+        } else {
+            setFinished(true);
         }
+    }
+
+    function normalizeNames(name: string | string[] | undefined): string[] {
+        if (!name) return [];
+        return Array.isArray(name) ? name : [name];
+    }
+
+    function normalizeText(str: string): string {
+        return str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace('&', 'and')
+            .replace('st', 'saint')
+            .toLowerCase()
+            .trim();
+    }
+
+    function formatTime(ms: number) {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        const milliseconds = ms % 1000;
+
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
     }
 
     useEffect(() => {
@@ -222,24 +276,19 @@ const FlagPractice = () => {
         }
     }, [mode, flag]);
 
+    // Timer
     useEffect(() => {
+        if (!started || finished) return;
+
+        const startTime = Date.now();
+
         const interval = setInterval(() => {
-            setElapsed((prev) => prev + 1);
-        }, 1000);
+            setElapsed(Date.now() - startTime);
+        }, 50); // update every 50ms
+
         return () => clearInterval(interval);
-    }, [practice]);
+    }, [started, finished]);
 
-    function handleGiveUp() {
-        if (!flag) return;
-
-        setPreviousAnswer(flag.name[0]);
-        setSubmittedGuess('');
-        setIsCorrect(false);
-        setGaveUp(true);
-        setSubmitted(false);
-
-        fetchRandomFlag();
-    }
 
     return (
         <>
@@ -270,7 +319,7 @@ const FlagPractice = () => {
                         <img
                             src={`https://flagcdn.com/h240/${flag.code}.png`}
                         />
-                        {(mode.value == 'typed') ?
+                        {(!finished && mode.value == 'typed') ?
                             <form onSubmit={handleTypedSubmit}>
                                 <input
                                     type="text"
@@ -280,7 +329,7 @@ const FlagPractice = () => {
                                 />
                                 <button className="submitButton" type="submit">Submit</button>
                             </form>
-                            : <div>{options.map(opt => (
+                            : (!finished && (<div>{options.map(opt => (
                                 <button
                                     key={opt}
                                     className="option"
@@ -292,8 +341,8 @@ const FlagPractice = () => {
                                     {opt}
                                 </button>
                             ))}
-                            </div>
-                        }
+                            </div>)
+                            )}
                         {(submitted || previousAnswer) && (
                             isCorrect ? (
                                 <p className="right response">{previousAnswer} was correct</p>
@@ -303,13 +352,17 @@ const FlagPractice = () => {
                                 <p className="wrong response">{submittedGuess} is incorrect</p>
                             )
                         )}
-                        <button className="giveUpButton" onClick={handleGiveUp}>Give Up</button>
-                        <p>Streak: {streak}</p>
-                        {practice.value == 0 && <div>
-                            <p>Correct: {correct}</p>
-                            <p>Incorrect: {incorrect}</p>
-                            <p>Time: {elapsed}</p>
-                        </div>}
+                        {!finished ?
+                            <button className="giveUpButton" onClick={handleGiveUp}>Give Up</button>
+                            : <button className="restartButton" onClick={playNormalMode}>Restart</button>
+                        }
+                        <div className="roundInfo">
+                            Streak: {streak} <br />
+                            Correct: {correct} <br />
+                            Incorrect: {incorrect} <br />
+                            Longest Streak: {longestStreak} <br />
+                            Time: {formatTime(elapsed)} <br />
+                        </div>
 
                     </div>
                 ) : (
