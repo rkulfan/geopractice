@@ -1,12 +1,14 @@
 #root {
-  max-width: 1280px;
+  max-width: 1920px;
   margin: 0 auto;
   padding: 2px;
   text-align: center;
 }
 
 .response {
+  margin: 16px 0 24px 0;
   line-height: 10%;
+  font-size: 20px;
 }
 
 .wrong {
@@ -19,18 +21,66 @@
 
 .giveUpButton {
   background-color: #6b0700;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  margin: 10px 0 0 0;
-  cursor: pointer;
 }
 
 .submitButton {
-  background-color: #004802;
+  background-color: #005a03;
+}
+
+.submitButton, .giveUpButton, .restartButton {
+  font-size: 22px;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  margin: 0 0 0 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 12px 20px;
+  margin: 0 0 4px 10px;
   cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+.restartButton {
+  background-color: #2a2a2a;
+  border: 1px solid #444444;
+}
+
+.restartButton:hover {
+  border-color: #777bc0;
+}
+
+.giveUpButton:hover {
+  border-color: #ab0700;
+}
+
+.submitButton:hover {
+  border-color: #009a03;
+}
+
+.tabButton {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 12px 20px;
+  font-size: 24px;
+  font-weight: 500;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+.tabButton:hover {
+  border-color: #646cff;
+}
+
+.button:focus,
+.button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+input {
+  padding: 8px;
+  font-size: 20px;
+  border-radius: 6px;
+}
+
+p {
+  font-size: 32px;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CategoryDropdown, ModeDropdown, PracticeDropdown } from './components/FlagHelpers';
 import type { CategoryOption, ModeOption, PracticeOption } from './components/FlagHelpers';
+import './FlagPractice.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -332,7 +333,7 @@ const FlagPractice = () => {
                             : (!finished && (<div>{options.map(opt => (
                                 <button
                                     key={opt}
-                                    className="option"
+                                    className="optionButton"
                                     type="button"
                                     onClick={() => {
                                         handleChoiceSubmit(opt);
@@ -357,11 +358,11 @@ const FlagPractice = () => {
                             : <button className="restartButton" onClick={playNormalMode}>Restart</button>
                         }
                         <div className="roundInfo">
-                            Streak: {streak} <br />
-                            Correct: {correct} <br />
-                            Incorrect: {incorrect} <br />
-                            Longest Streak: {longestStreak} <br />
-                            Time: {formatTime(elapsed)} <br />
+                            Streak: {streak}<br />
+                            Correct: {correct}<br />
+                            Incorrect: {incorrect}<br />
+                            Longest Streak: {longestStreak}<br />
+                            Time: {formatTime(elapsed)}<br />
                         </div>
 
                     </div>

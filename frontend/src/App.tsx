@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import RussianPractice from './Transliteration';
 import FlagPractice from './FlagPractice';
+import './App.css';
 
 enum Tab {
   Transliteration = 'Transliteration',
@@ -14,10 +15,10 @@ function App() {
     <div>
       {/* Tabs */}
       <nav style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-        <button onClick={() => setActiveTab(Tab.Transliteration)}>
+        <button className="tabButton" onClick={() => setActiveTab(Tab.Transliteration)}>
           Russian Transliteration
         </button>
-        <button onClick={() => setActiveTab(Tab.Flags)}>
+        <button className="tabButton" onClick={() => setActiveTab(Tab.Flags)}>
           Flag Identification
         </button>
       </nav>
