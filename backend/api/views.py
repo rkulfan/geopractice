@@ -43,3 +43,22 @@ def get_random_flag(request):
             return Response({'code': code, 'name': names})
 
     return Response({'code': 'xx', 'name': ['Unknown']})
+
+@api_view(['GET'])
+def get_all_flags(request):
+    category = request.GET.get('category') or 'countries'
+
+    if category == 'all':
+        all_entries = [
+            {'code': code, 'name': names}
+            for cat_map in flag_map.values()
+            for code, names in cat_map.items()
+        ]
+        return Response(all_entries)
+    else:
+        cat_map = flag_map.get(category)
+        if cat_map:
+            entries = [{'code': code, 'name': names} for code, names in cat_map.items()]
+            return Response(entries)
+
+    return Response([])

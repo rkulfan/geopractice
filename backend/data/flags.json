@@ -87,7 +87,7 @@
         "gq": "Equatorial Guinea",
         "gr": "Greece",
         "gt": "Guatemala",
-        "gw": "Guinea-Bissau",
+        "gw": ["Guinea-Bissau", "Guinea Bissau"],
         "gy": "Guyana",
         "hn": "Honduras",
         "hr": "Croatia",
