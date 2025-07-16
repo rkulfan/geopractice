@@ -1,0 +1,44 @@
+.dropdown {
+    padding: 8px 12px;
+    margin: 2px;
+    font-size: 20px;
+    border: 1px solid #838383;
+    border-radius: 6px;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.dropdown:hover {
+    border-color: #0056b3;
+}
+
+.dropdown:focus {
+    outline: none;
+    border-color: #0056b3;
+}
+
+.optionButton {
+    margin: 4px 4px 8px 4px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 12px 16px 12px 16px;
+    font-size: 20px;
+    font-weight: 500;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.25s;
+}
+
+.optionButton:hover {
+    border-color: #646cff;
+}
+
+img {
+    width: 30%;
+}
+
+.roundInfo {
+    font-size: 20px;
+}

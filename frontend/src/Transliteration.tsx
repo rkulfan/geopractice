@@ -79,7 +79,7 @@ function RussianPractice() {
         {error && <p style={{ color: 'red' }}>Error: {error}</p>}
         {player && (
           <div>
-            <p>{player.native}</p>
+            <p className="playerName">{player.native}</p>
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
