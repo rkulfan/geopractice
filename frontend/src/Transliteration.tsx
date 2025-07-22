@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_BASE_URL } from './config';
 import './App.css';
 
 interface Player {
@@ -6,9 +7,7 @@ interface Player {
   latin: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-function RussianPractice() {
+function Transliteration() {
   const [player, setPlayer] = useState<Player | null>(null);
   const [error, setError] = useState(null);
   const [inputValue, setInputValue] = useState('');
@@ -106,4 +105,4 @@ function RussianPractice() {
   );
 }
 
-export default RussianPractice;
+export default Transliteration;
