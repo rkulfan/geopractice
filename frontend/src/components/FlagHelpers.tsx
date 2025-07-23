@@ -49,7 +49,7 @@ const practiceOptions: PracticeOption[] = [
 
 export function CategoryDropdown({ selected, onChange }: CategoryDropdownProps) {
   return (
-    <select className="dropdown"
+    <select aria-label="Select category" className="dropdown"
       value={selected.value}
       onChange={(e) => {
         const selectedOption = categoryOptions.find(opt => opt.value === e.target.value);
@@ -69,7 +69,7 @@ export function CategoryDropdown({ selected, onChange }: CategoryDropdownProps) 
 
 export function ModeDropdown({ selected, onChange }: ModeDropdownProps) {
   return (
-    <select className="dropdown"
+    <select aria-label="Select mode" className="dropdown"
       value={selected.value}
       onChange={(e) => {
         const selectedOption = modeOptions.find(opt => opt.value === e.target.value);
@@ -89,7 +89,7 @@ export function ModeDropdown({ selected, onChange }: ModeDropdownProps) {
 
 export function PracticeDropdown({ selected, onChange }: PracticeDropdownProps) {
   return (
-    <select className="dropdown"
+    <select aria-label="Select practice" className="dropdown"
       value={selected.value}
       onChange={(e) => {
         const selectedOption = practiceOptions.find(opt => opt.value === Number(e.target.value));

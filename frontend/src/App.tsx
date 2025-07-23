@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import RussianPractice from './Transliteration';
+import Transliteration from './Transliteration';
 import FlagPractice from './FlagPractice';
 import './App.css';
 
@@ -24,7 +24,7 @@ function App() {
       </nav>
 
       {/* Tab Content */}
-      {activeTab === Tab.Transliteration && <RussianPractice />}
+      {activeTab === Tab.Transliteration && <Transliteration />}
       {activeTab === Tab.Flags && <FlagPractice />}
     </div>
   );
