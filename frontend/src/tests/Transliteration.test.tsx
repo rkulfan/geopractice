@@ -20,77 +20,79 @@ const mockPlayer = {
   latin: 'Igrok',
 };
 
-test('renders player name after fetch', async () => {
-  (fetch as jest.Mock).mockResolvedValueOnce({
-    ok: true,
-    json: async () => mockPlayer,
+describe('Transliteration Component', () => {
+  test('renders player name after fetch', async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockPlayer,
+    });
+
+    render(<Transliteration />);
+    expect(await screen.findByText(/Игрок/)).toBeInTheDocument();
   });
 
-  render(<Transliteration />);
-  expect(await screen.findByText(/Игрок/)).toBeInTheDocument();
-});
+  test('handles user input and submits correct transliteration', async () => {
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => mockPlayer,
+    });
 
-test('handles user input and submits correct transliteration', async () => {
-  (fetch as jest.Mock).mockResolvedValue({
-    ok: true,
-    json: async () => mockPlayer,
+    render(<Transliteration />);
+    await screen.findByText(/Игрок/);
+
+    fireEvent.change(screen.getByPlaceholderText(/transliteration/i), {
+      target: { value: 'Igrok' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText(/was correct/i)).toBeInTheDocument()
+    );
   });
 
-  render(<Transliteration />);
-  await screen.findByText(/Игрок/);
+  test('handles incorrect transliteration', async () => {
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => mockPlayer,
+    });
 
-  fireEvent.change(screen.getByPlaceholderText(/transliteration/i), {
-    target: { value: 'Igrok' },
-  });
-  fireEvent.click(screen.getByRole('button', { name: /submit/i }));
+    render(<Transliteration />);
+    await screen.findByText(/Игрок/);
 
-  await waitFor(() =>
-    expect(screen.getByText(/was correct/i)).toBeInTheDocument()
-  );
-});
+    fireEvent.change(screen.getByPlaceholderText(/transliteration/i), {
+      target: { value: 'wrong' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /submit/i }));
 
-test('handles incorrect transliteration', async () => {
-  (fetch as jest.Mock).mockResolvedValue({
-    ok: true,
-    json: async () => mockPlayer,
-  });
-
-  render(<Transliteration />);
-  await screen.findByText(/Игрок/);
-
-  fireEvent.change(screen.getByPlaceholderText(/transliteration/i), {
-    target: { value: 'wrong' },
-  });
-  fireEvent.click(screen.getByRole('button', { name: /submit/i }));
-
-  await waitFor(() =>
-    expect(screen.getByText(/is incorrect/i)).toBeInTheDocument()
-  );
-});
-
-test('handles give up button', async () => {
-  (fetch as jest.Mock).mockResolvedValue({
-    ok: true,
-    json: async () => mockPlayer,
+    await waitFor(() =>
+      expect(screen.getByText(/is incorrect/i)).toBeInTheDocument()
+    );
   });
 
-  render(<Transliteration />);
-  await screen.findByText(/Игрок/);
+  test('handles give up button', async () => {
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => mockPlayer,
+    });
 
-  fireEvent.click(screen.getByRole('button', { name: /give up/i }));
+    render(<Transliteration />);
+    await screen.findByText(/Игрок/);
 
-  await waitFor(() =>
-    expect(
-      screen.getByText(/the correct answer was/i)
-    ).toBeInTheDocument()
-  );
-});
+    fireEvent.click(screen.getByRole('button', { name: /give up/i }));
 
-test('displays error message on fetch failure', async () => {
-  (fetch as jest.Mock).mockRejectedValue(new Error('Fetch failed'));
+    await waitFor(() =>
+      expect(
+        screen.getByText(/the correct answer was/i)
+      ).toBeInTheDocument()
+    );
+  });
 
-  render(<Transliteration />);
-  await waitFor(() =>
-    expect(screen.getByText(/error: fetch failed/i)).toBeInTheDocument()
-  );
-});
+  test('displays error message on fetch failure', async () => {
+    (fetch as jest.Mock).mockRejectedValue(new Error('Fetch failed'));
+
+    render(<Transliteration />);
+    await waitFor(() =>
+      expect(screen.getByText(/error: fetch failed/i)).toBeInTheDocument()
+    );
+  });
+})
