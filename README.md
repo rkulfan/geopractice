@@ -4,10 +4,9 @@ Website for users to practice and study everything geography related.
 ## Existing Features
 - Russian cyrillic transliteration of Russian ice hockey player names
 - Country flag identification practice (typing + multiple choice)
-  - \+ correct streaks
+  - Includes a practice mode and normal mode
 
 ## Planned Features
-- Country flag mode that goes through every flag in the category, rather than being random every time
 - Country capital quizzes
 - Further language identification and transliteration practice
 - Other areas to practice:
@@ -16,6 +15,7 @@ Website for users to practice and study everything geography related.
   - Country outlines
   - Biggest cities globally/per country
   - ...and more
+ - Save personal bests for each user
 
 ## Tech Stack
 -   **Communication Protocol**:
