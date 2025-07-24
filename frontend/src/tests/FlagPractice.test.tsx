@@ -9,7 +9,12 @@ jest.mock('../config', () => ({
 
 // Mock fetch globally
 beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = jest.fn().mockImplementation(() =>
+        Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(mockAllFlags),
+        })
+    );
 });
 
 afterEach(() => {
@@ -113,44 +118,86 @@ describe('FlagPractice Component', () => {
         expect(screen.getByPlaceholderText(/answer/i)).toBeInTheDocument();
     });
 
-    test('accepts correct typed guess', async () => {
-        (fetch as jest.Mock).mockResolvedValueOnce({
-            ok: true,
-            json: async () => [mockFlag],
-        });
+    test('displays correct information in normal mode', async () => {
+        (fetch as jest.Mock)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockAllFlags,
+            })
 
         render(<FlagPractice />);
 
-        await waitFor(() => screen.getByPlaceholderText(/answer/i));
+        await waitFor(() => screen.getByRole('combobox', { name: /select category/i }));
 
+        fireEvent.change(screen.getByRole('combobox', { name: /select practice/i }), {
+            target: { value: 0 },
+        });
+
+        // Correct answer
         fireEvent.change(screen.getByPlaceholderText(/answer/i), {
-            target: { value: 'United States' }
+            target: { value: mockAllFlags[0].name[0] },
         });
         fireEvent.click(screen.getByText(/submit/i));
 
-        await waitFor(() =>
+        await waitFor(() => {
             expect(screen.getByText(/was correct/i)).toBeInTheDocument()
-        );
+            expect(screen.getByText(/correct: 1/i)).toBeInTheDocument()
+        });
+
+        // Incorrect answer
+        fireEvent.change(screen.getByPlaceholderText(/answer/i), {
+            target: { value: mockAllFlags[1].name[0] },
+        });
+        fireEvent.click(screen.getByText(/submit/i));
+
+        await waitFor(() => {
+            expect(screen.getByText(/the correct answer was/i)).toBeInTheDocument()
+            expect(screen.getByText(/correct: 1/i)).toBeInTheDocument()
+            expect(screen.getByText(/incorrect: 1/i)).toBeInTheDocument()
+            expect(screen.getByText(/streak: 0/i)).toBeInTheDocument()
+            expect(screen.getByText(/longest streak: 1/i)).toBeInTheDocument()
+        });
     });
 
-    test('shows incorrect feedback when guess is wrong', async () => {
-        (fetch as jest.Mock).mockResolvedValueOnce({
-            ok: true,
-            json: async () => [mockFlag],
-        });
+    test('displays correct information in practice mode', async () => {
+        (fetch as jest.Mock)
+            .mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockAllFlags,
+            })
 
         render(<FlagPractice />);
 
-        await waitFor(() => screen.getByPlaceholderText(/answer/i));
+        await waitFor(() => screen.getByRole('combobox', { name: /select category/i }));
 
+        fireEvent.change(screen.getByRole('combobox', { name: /select practice/i }), {
+            target: { value: 1 },
+        });
+
+        // Correct answer
         fireEvent.change(screen.getByPlaceholderText(/answer/i), {
-            target: { value: 'Canada' },
+            target: { value: mockAllFlags[0].name[0] },
         });
         fireEvent.click(screen.getByText(/submit/i));
 
-        await waitFor(() =>
-            expect(screen.getByText(/the correct answer was/i)).toBeInTheDocument()
-        );
+        await waitFor(() => {
+            expect(screen.getByText(/was correct/i)).toBeInTheDocument()
+            expect(screen.getByText(/correct: 1/i)).toBeInTheDocument()
+        });
+
+        // Incorrect answer
+        fireEvent.change(screen.getByPlaceholderText(/answer/i), {
+            target: { value: mockAllFlags[1].name[0] },
+        });
+        fireEvent.click(screen.getByText(/submit/i));
+
+        await waitFor(() => {
+            expect(screen.getByText(/is incorrect/i)).toBeInTheDocument()
+            expect(screen.getByText(/correct: 1/i)).toBeInTheDocument()
+            expect(screen.getByText(/incorrect: 1/i)).toBeInTheDocument()
+            expect(screen.getByText(/streak: 0/i)).toBeInTheDocument()
+            expect(screen.getByText(/longest streak: 1/i)).toBeInTheDocument()
+        });
     });
 
     test('advances to next flag after correct guess', async () => {
