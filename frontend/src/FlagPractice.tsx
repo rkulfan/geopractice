@@ -12,7 +12,7 @@ interface Country {
 const FlagPractice = () => {
     const [category, setCategory] = useState<CategoryOption>({ value: 'countries', name: "Countries", tag: "country's" });
     const [mode, setMode] = useState<ModeOption>({ value: 'typed', name: "Typed" });
-    const [practice, setPractice] = useState<PracticeOption>({ value: 0, name: "Practice" });
+    const [practice, setPractice] = useState<PracticeOption>({ value: 0, name: "Normal" });
     const [options, setOptions] = useState<string[]>([]);
     const [flag, setFlag] = useState<Country | null>(null);
     const [error, setError] = useState(null);
@@ -32,11 +32,13 @@ const FlagPractice = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [started, setStarted] = useState(false);
     const [finished, setFinished] = useState(false);
+    const [countedIncorrect, setCountedIncorrect] = useState(false);
 
     function fetchRandomFlag() {
         setError(null);
         setInputValue('');
         setSubmittedGuess('');
+        setCountedIncorrect(false);
 
         fetch(`${API_BASE_URL}/flag/random?category=${category.value}`)
             .then(res => {
@@ -99,23 +101,28 @@ const FlagPractice = () => {
         setGaveUp(false);
 
         if (isCorrect) {
-            setStreak(prev => {
-                const newStreak = prev + 1;
-                setLongestStreak(ls => Math.max(ls, newStreak));
-                return newStreak;
-            });
             setPreviousAnswer(names[0]);
-            if (practice.value == 0) {
+            if (!countedIncorrect) {
+                setStreak(prev => {
+                    const newStreak = prev + 1;
+                    setLongestStreak(ls => Math.max(ls, newStreak));
+                    return newStreak;
+                });
                 setCorrect(prev => prev + 1);
+            }
+            if (practice.value == 0) {
                 nextFlag();
             } else {
                 fetchRandomFlag();
             }
         } else {
             setStreak(0);
+            if (!countedIncorrect) {
+                setIncorrect(prev => prev + 1);
+                setCountedIncorrect(true);
+            }
             if (practice.value == 0) {
                 setPreviousAnswer(names[0]);
-                setIncorrect(prev => prev + 1);
                 setGaveUp(true);
                 nextFlag();
             }
@@ -191,18 +198,7 @@ const FlagPractice = () => {
     }
 
     function playNormalMode() {
-        setElapsed(0);
-        setIncorrect(0);
-        setCorrect(0);
-        setStreak(0);
-        setLongestStreak(0);
-        setStarted(false);
-        setFinished(false);
-        setSubmitted(false);
-        setError(null);
-        setInputValue('');
-        setSubmittedGuess('');
-        setPreviousAnswer('');
+        resetRoundValues();
 
         fetch(`${API_BASE_URL}/flag/all?category=${category.value}`)
             .then(res => {
@@ -228,6 +224,7 @@ const FlagPractice = () => {
     }
 
     function nextFlag() {
+        setCountedIncorrect(false);
         const nextIndex = currentIndex + 1;
         if (nextIndex < allFlags.length) {
             setCurrentIndex(nextIndex);
@@ -259,6 +256,21 @@ const FlagPractice = () => {
         const milliseconds = ms % 1000;
 
         return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+    }
+
+    function resetRoundValues() {
+        setElapsed(0);
+        setIncorrect(0);
+        setCorrect(0);
+        setStreak(0);
+        setLongestStreak(0);
+        setStarted(false);
+        setFinished(false);
+        setSubmitted(false);
+        setError(null);
+        setInputValue('');
+        setSubmittedGuess('');
+        setPreviousAnswer('');
     }
 
     useEffect(() => {
@@ -299,7 +311,14 @@ const FlagPractice = () => {
                 />
                 <ModeDropdown
                     selected={mode}
-                    onChange={(value: ModeOption) => setMode(value)}
+                    onChange={(value: ModeOption) => {
+                        setMode(value);
+                        if (practice.value == 0) {
+                            playNormalMode();
+                        } else {
+                            resetRoundValues();
+                        }
+                    }}
                 />
                 <PracticeDropdown
                     selected={practice}
@@ -308,6 +327,9 @@ const FlagPractice = () => {
                             setPractice(value);
                             if (practice.value == 0) {
                                 playNormalMode();
+                            } else {
+                                resetRoundValues();
+                                fetchRandomFlag();
                             }
                         }
                     }
